@@ -9,6 +9,10 @@ public class Task implements TasksInterface{
 
   public Task(){}
 
+  public Task(String name, LocalDate predictedDate, Importance importance){
+    this(false, name, predictedDate, LocalDate.now(), importance);
+  }
+
   public Task(Boolean completed, String name, LocalDate predictedDate,
               LocalDate complitionDate, Importance importance){
     this.completed = completed;
