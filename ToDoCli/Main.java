@@ -3,13 +3,15 @@ import java.util.HashSet;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Main{
   private Set<ToDo> td;
   private String[] menuOptions, tskCreate;
   private BufferedReader br;
+  private Validator v;
+  private DateTimeFormatter dtf;
   {
     td = new HashSet<ToDo>();
     menuOptions = new String[]{"[1] Add ToDo",
@@ -19,8 +21,10 @@ public class Main{
                                 "[5] Finish Task"};
     tskCreate = new String[]{"Name: ",
                             "Predicted Date YYYY-MM-DD: ",
-                            "Importance:%n\t[1]Low%n\t[2]Medium%n[3]\tHigh "};
+                            "Importance:%n\t[1]Low%n\t[2]Medium%n\t[3]High "};
     br = new BufferedReader(new InputStreamReader(System.in));
+    v = new Validator();
+    dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   }
   public static void main(String... args){
     Main m = new Main();
@@ -38,14 +42,31 @@ public class Main{
   }
   private void createTodo(){
     String ui = "";
-    Boolean isValid = false;
+    boolean isValid = false;
+    int stage = 1;
+    ToDo todo = new ToDo();
     for(String s : tskCreate){
-      System.out.printf(s);
       do{
+        System.out.printf(s);
         ui = getInput();
-        isValid = validateInput(ui);
+        isValid = v.validateAddTask(ui, stage);
+        if(isValid){
+          switch(stage){
+            case 1:
+              todo.setName(ui);
+              break;
+            case 2:
+              todo.setPredictedDate(stringToDate(ui));
+              break;
+            case 3:
+              todo.setImportance(intToImportance(parseUserInt(ui)));
+              break;
+          }
+          stage++;
+        }
       }while(!isValid);
     }
+    td.add(todo);
   }
   private void finishTodo(){
     //TODO: Create body
@@ -106,10 +127,22 @@ public class Main{
       return "";
     }
   }
-  private Boolean validateInput(String s){
-    if(s.isEmpty()) return false;
-    Pattern p = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
-    Matcher m = p.matcher(s);
-    return m.matches();
+  private LocalDate stringToDate(String s){
+    return LocalDate.parse(s, dtf);
+  }
+  private Importance intToImportance(Integer i){
+    Importance imp = null;
+    switch(i){
+      case 1:
+        imp = Importance.LOW;
+        break;
+      case 2:
+        imp = Importance.MEDIUM;
+        break;
+      case 3:
+        imp = Importance.HIGH;
+        break;
+    }
+    return imp;
   }
 }

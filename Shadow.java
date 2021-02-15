@@ -6,6 +6,8 @@ public class Shadow{
 		int y = 3;
 		System.out.println(x);
 		System.out.println(y);
-		System.out.println(this.y);
+		Shadow s = new Shadow();
+		System.out.println(s.x);
+		System.out.println(Shadow.y);
 	}
 }

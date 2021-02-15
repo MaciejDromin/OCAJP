@@ -11,6 +11,7 @@ public class ToDo extends Task{
               LocalDate complitionDate, Importance importance){
     super(completed, name, predictedDate, complitionDate, importance);
   }
+  public ToDo(){super();}
   public void addTask(Task t){
     this.tl.add(t);
   }
