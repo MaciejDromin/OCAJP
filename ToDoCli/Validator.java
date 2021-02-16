@@ -30,7 +30,7 @@ public class Validator{
 
   public boolean isDate(String s){
     if(s.isEmpty()) return false;
-    p = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
+    p = Pattern.compile("^\\d{4}-[0-1]{1}\\d{1}-\\d{2}$");
     m = p.matcher(s);
     return m.matches();
   }
@@ -54,5 +54,28 @@ public class Validator{
     p = Pattern.compile("^[1-3]{1}$");
     m = p.matcher(s);
     return m.matches();
+  }
+
+  public boolean validateChooseTask(String ui, int size){
+    if(ui.isEmpty()) return false;
+    String patt = "^";
+    for(int x=0;x<size;x++){
+      patt = patt.concat("["+x+"]{1}+");
+    }
+    patt = patt.substring(0, patt.length()-1);
+    patt = patt.concat("$");
+    p = Pattern.compile(patt);
+    m = p.matcher(ui);
+    return m.matches();
+  }
+
+  public boolean validateEndTask(String ui){
+    boolean ret = false;
+    if(ui.isEmpty()) return ret;
+    p = Pattern.compile("^Today$");
+    m = p.matcher(ui);
+    ret = m.matches();
+    if(!ret) return isDate(ui);
+    return ret;
   }
 }

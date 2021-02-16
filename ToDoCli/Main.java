@@ -1,5 +1,5 @@
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -7,13 +7,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Main{
-  private Set<ToDo> td;
+  private List<ToDo> td;
   private String[] menuOptions, tskCreate;
   private BufferedReader br;
   private Validator v;
   private DateTimeFormatter dtf;
   {
-    td = new HashSet<ToDo>();
+    td = new ArrayList<ToDo>();
     menuOptions = new String[]{"[1] Add ToDo",
                                 "[2] Print ToDos",
                                 "[3] Finish ToDo",
@@ -68,16 +68,57 @@ public class Main{
     }
     td.add(todo);
   }
-  private void finishTodo(){
-    //TODO: Create body
-    System.out.println("Test2");
+  private void finishTodo(int c){
+    System.out.printf("When did you finished?%nToday: %n"+
+                      "Date with correct format(YYYY-MM-DD): ");
+    String ui = "";
+    boolean isValid = false;
+    do{
+      ui = getInput();
+      isValid = v.validateEndTask(ui);
+    }while(!isValid);
+    if(ui.equals("Today")) td.get(c).setComplitionDate(LocalDate.now());
+    else td.get(c).setComplitionDate(stringToDate(ui));
   }
   private void chooseTodo(int c){
-    //TODO: Create body
-    System.out.println("Test3");
+    String ui = "";
+    boolean isValid = false;
+    int choosedTodo = 0;
+    do{
+      ui = getInput();
+      isValid = v.validateChooseTask(ui, (td.size()));
+      choosedTodo = parseUserInt(ui);
+    } while(!isValid);
+    if(c==3) finishTodo(choosedTodo);
+    else createTask(choosedTodo);
   }
-  private void createTask(){
-    //TODO: Create body
+  private void createTask(int c){
+    String ui = "";
+    boolean isValid = false;
+    int stage = 1;
+    Task task = new Task();
+    for(String s : tskCreate){
+      do{
+        System.out.printf(s);
+        ui = getInput();
+        isValid = v.validateAddTask(ui, stage);
+        if(isValid){
+          switch(stage){
+            case 1:
+              task.setName(ui);
+              break;
+            case 2:
+              task.setPredictedDate(stringToDate(ui));
+              break;
+            case 3:
+              task.setImportance(intToImportance(parseUserInt(ui)));
+              break;
+          }
+          stage++;
+        }
+      }while(!isValid);
+    }
+    td.get(c).addTask(task);
   }
   private void finishTask(){
     //TODO: Create body
@@ -88,10 +129,11 @@ public class Main{
         createTodo();
         break;
       case 2:
-        printToDos();
+        printToDosWithTasks();
         break;
       case 3:
       case 4:
+        printToDos();
         chooseTodo(choice);
         break;
       case 5:
@@ -103,12 +145,17 @@ public class Main{
     System.out.println("What do you want to do?");
     for(String s : menuOptions) System.out.println("\t"+s);
   }
-  private void printToDos(){
+  private void printToDosWithTasks(){
     for(ToDo todo : td){
       System.out.println(todo.toString());
       for(Task task : todo.getTaskList()){
-        System.out.println(task.toString());
+        System.out.println("\t"+task.toString());
       }
+    }
+  }
+  private void printToDos(){
+    for(ToDo todo : td){
+      System.out.println("["+td.indexOf(todo)+"] "+todo.toString());
     }
   }
   private Integer parseUserInt(String s){

@@ -1,11 +1,11 @@
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.time.LocalDate;
 
 public class ToDo extends Task{
-  private Set<Task> tl;
+  private List<Task> tl;
   {
-    tl = new HashSet<Task>();
+    tl = new ArrayList<Task>();
   }
   public ToDo(Boolean completed, String name, LocalDate predictedDate,
               LocalDate complitionDate, Importance importance){
@@ -15,7 +15,7 @@ public class ToDo extends Task{
   public void addTask(Task t){
     this.tl.add(t);
   }
-  public Set<Task> getTaskList(){
+  public List<Task> getTaskList(){
     return this.tl;
   }
 }

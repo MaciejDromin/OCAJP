@@ -39,6 +39,7 @@ public class Task implements TasksInterface{
   }
   public void setComplitionDate(LocalDate complitionDate){
     this.complitionDate = complitionDate;
+    this.completed = true;
   }
   public LocalDate getComplitionDate(){
     return this.complitionDate;
