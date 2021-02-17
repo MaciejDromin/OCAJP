@@ -98,17 +98,21 @@ public class Main{
     } while(!isValid);
     if(c==3) finishTodo(choosedTodo);
     else if(c==4) createTask(choosedTodo);
-    else chooseTask(choosedTodo);
+    else{
+      if(printTasks(td.get(choosedTodo))) chooseTask(td.get(choosedTodo));
+      else System.out.println("There are no Tasks in this Todo, add some.");
+    }
   }
-  private void chooseTask(int c){
+  private void chooseTask(ToDo iTodo){
     String ui = "";
     boolean isValid = false;
-    int choosedTodo = 0;
+    int choosedTask = 0;
     do{
       ui = getInput();
-      isValid = v.validateChooseTask(ui, (td.size()));
-      choosedTodo = parseUserInt(ui);
+      isValid = v.validateChooseTask(ui, (iTodo.getTaskList().size()));
+      choosedTask = parseUserInt(ui);
     } while(!isValid);
+    finishTask(iTodo, choosedTask);
   }
   private void createTask(int c){
     String ui = "";
@@ -138,8 +142,17 @@ public class Main{
     }
     td.get(c).addTask(task);
   }
-  private void finishTask(){
-    //TODO: Create body
+  private void finishTask(ToDo iTodo, int c){
+    System.out.printf("When did you finished?%nToday: %n"+
+                      "Date with correct format(YYYY-MM-DD): ");
+    String ui = "";
+    boolean isValid = false;
+    do{
+      ui = getInput();
+      isValid = v.validateEndTask(ui);
+    }while(!isValid);
+    if(ui.equals("Today")) iTodo.getTaskList().get(c).setComplitionDate(LocalDate.now());
+    else iTodo.getTaskList().get(c).setComplitionDate(stringToDate(ui));
   }
   private void chooseOption(int choice){
     switch(choice){
@@ -147,14 +160,16 @@ public class Main{
         createTodo();
         break;
       case 2:
-        printToDosWithTasks();
+        if(!printToDosWithTasks()) System.out.println("There are no todos, add some.");
         break;
       case 3:
       case 4:
           if(printToDos()) chooseTodo(choice);
+          else System.out.println("There are no todos, add some.");
         break;
       case 5:
-        finishTask();
+        if(printToDosWithTasks()) chooseTodo(choice);
+        else System.out.println("There are no todos, add some.");
         break;
     }
   }
@@ -162,18 +177,28 @@ public class Main{
     System.out.println("What do you want to do?");
     for(String s : menuOptions) System.out.println("\t"+s);
   }
-  private void printToDosWithTasks(){
+  private boolean printToDosWithTasks(){
+    if(td.isEmpty()) return false;
     for(ToDo todo : td){
-      System.out.println(todo.toString());
+      System.out.println("["+td.indexOf(todo)+"] "+todo.toString());
       for(Task task : todo.getTaskList()){
         System.out.println("\t"+task.toString());
       }
     }
+    return true;
   }
   private boolean printToDos(){
     if(td.isEmpty()) return false;
     for(ToDo todo : td){
       System.out.println("["+td.indexOf(todo)+"] "+todo.toString());
+    }
+    return true;
+  }
+  private boolean printTasks(ToDo iT){
+    List<Task> tl = iT.getTaskList();
+    if(tl.isEmpty()) return false;
+    for(Task t : tl){
+      System.out.println("["+tl.indexOf(t)+"] "+t.toString());
     }
     return true;
   }
