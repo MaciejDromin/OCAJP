@@ -59,10 +59,19 @@ public class Validator{
   public boolean validateChooseTask(String ui, int size){
     if(ui.isEmpty()) return false;
     String patt = "^";
-    for(int x=0;x<size;x++){
-      patt = patt.concat("["+x+"]{1}+");
+    String s = String.valueOf(size-1);
+    char[] ch = s.toCharArray();
+    int iFor = 0;
+    if(size<11) patt = patt.concat("[0-"+ch[0]+"]{1}");
+    else{
+      patt = patt.concat("(");
+      iFor = ch[0]-48;
+      for(int a = 0; a<iFor;a++){
+        if(a+1==iFor)patt = patt.concat("(["+(a+1)+"]{1}+[0-"+ch[1]+"]{1})");
+        else patt = patt.concat("(["+(a+1)+"]{1}+[\\d]{1})|");
+      }
+      patt = patt.concat(")|([\\d]{1})");
     }
-    patt = patt.substring(0, patt.length()-1);
     patt = patt.concat("$");
     p = Pattern.compile(patt);
     m = p.matcher(ui);

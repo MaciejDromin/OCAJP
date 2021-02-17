@@ -25,6 +25,13 @@ public class Main{
     br = new BufferedReader(new InputStreamReader(System.in));
     v = new Validator();
     dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    /*for(int i=0;i<25;i++){
+      ToDo ntd = new ToDo();
+      ntd.setName("Test");
+      ntd.setPredictedDate(LocalDate.now());
+      ntd.setImportance(Importance.LOW);
+      td.add(ntd);
+    }*/
   }
   public static void main(String... args){
     Main m = new Main();
@@ -90,7 +97,18 @@ public class Main{
       choosedTodo = parseUserInt(ui);
     } while(!isValid);
     if(c==3) finishTodo(choosedTodo);
-    else createTask(choosedTodo);
+    else if(c==4) createTask(choosedTodo);
+    else chooseTask(choosedTodo);
+  }
+  private void chooseTask(int c){
+    String ui = "";
+    boolean isValid = false;
+    int choosedTodo = 0;
+    do{
+      ui = getInput();
+      isValid = v.validateChooseTask(ui, (td.size()));
+      choosedTodo = parseUserInt(ui);
+    } while(!isValid);
   }
   private void createTask(int c){
     String ui = "";
@@ -133,8 +151,7 @@ public class Main{
         break;
       case 3:
       case 4:
-        printToDos();
-        chooseTodo(choice);
+          if(printToDos()) chooseTodo(choice);
         break;
       case 5:
         finishTask();
@@ -153,10 +170,12 @@ public class Main{
       }
     }
   }
-  private void printToDos(){
+  private boolean printToDos(){
+    if(td.isEmpty()) return false;
     for(ToDo todo : td){
       System.out.println("["+td.indexOf(todo)+"] "+todo.toString());
     }
+    return true;
   }
   private Integer parseUserInt(String s){
     try{
