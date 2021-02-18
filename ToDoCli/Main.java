@@ -12,6 +12,7 @@ public class Main{
   private BufferedReader br;
   private Validator v;
   private DateTimeFormatter dtf;
+  private FileParser fp;
   {
     td = new ArrayList<ToDo>();
     menuOptions = new String[]{"[1] Add ToDo",
@@ -25,17 +26,26 @@ public class Main{
     br = new BufferedReader(new InputStreamReader(System.in));
     v = new Validator();
     dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    /*for(int i=0;i<25;i++){
+    fp = new FileParser();
+    for(int i=0;i<5;i++){
       ToDo ntd = new ToDo();
+      Task ttt = new Task();
       ntd.setName("Test");
       ntd.setPredictedDate(LocalDate.now());
       ntd.setImportance(Importance.LOW);
+      for(int n=0;n<5;n++){
+        ttt.setName("Test");
+        ttt.setPredictedDate(LocalDate.now());
+        ttt.setImportance(Importance.LOW);
+        ntd.addTask(ttt);
+      }
       td.add(ntd);
-    }*/
+    }
   }
   public static void main(String... args){
     Main m = new Main();
     m.createLoop();
+    m.fp.saveSession(m.td);
   }
   private void createLoop(){
     String userChoiceS = "";
