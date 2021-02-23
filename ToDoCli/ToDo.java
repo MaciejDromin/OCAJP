@@ -18,4 +18,7 @@ public class ToDo extends Task{
   public List<Task> getTaskList(){
     return this.tl;
   }
+  public void setTaskList(List<Task> tl){
+    this.tl = tl;
+  }
 }

@@ -4,14 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class Main{
   private List<ToDo> td;
   private String[] menuOptions, tskCreate;
   private BufferedReader br;
   private Validator v;
-  private DateTimeFormatter dtf;
   private FileParser fp;
   {
     td = new ArrayList<ToDo>();
@@ -25,25 +23,26 @@ public class Main{
                             "Importance:%n\t[1]Low%n\t[2]Medium%n\t[3]High "};
     br = new BufferedReader(new InputStreamReader(System.in));
     v = new Validator();
-    dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     fp = new FileParser();
-    for(int i=0;i<5;i++){
+    /*for(int i=0;i<5;i++){
       ToDo ntd = new ToDo();
       Task ttt = new Task();
       ntd.setName("Test");
       ntd.setPredictedDate(LocalDate.now());
       ntd.setImportance(Importance.LOW);
-      for(int n=0;n<5;n++){
+      /*for(int n=0;n<5;n++){
         ttt.setName("Test");
         ttt.setPredictedDate(LocalDate.now());
         ttt.setImportance(Importance.LOW);
         ntd.addTask(ttt);
       }
       td.add(ntd);
-    }
+    }*/
   }
   public static void main(String... args){
     Main m = new Main();
+    m.fp.openSession(m.td);
+    //System.out.println(System.getProperty("user.dir"));
     m.createLoop();
     m.fp.saveSession(m.td);
   }
@@ -52,7 +51,8 @@ public class Main{
     int userChoice = 0;
     printMenu();
     while(!(userChoiceS = getInput()).isEmpty()){
-      userChoice = parseUserInt(userChoiceS);
+      userChoice = InputParser.parseUserInt(userChoiceS);
+      if(userChoice==9) break;
       if(userChoice!=0) chooseOption(userChoice);
       printMenu();
     }
@@ -73,10 +73,10 @@ public class Main{
               todo.setName(ui);
               break;
             case 2:
-              todo.setPredictedDate(stringToDate(ui));
+              todo.setPredictedDate(InputParser.stringToDate(ui));
               break;
             case 3:
-              todo.setImportance(intToImportance(parseUserInt(ui)));
+              todo.setImportance(InputParser.intToImportance(InputParser.parseUserInt(ui)));
               break;
           }
           stage++;
@@ -95,7 +95,7 @@ public class Main{
       isValid = v.validateEndTask(ui);
     }while(!isValid);
     if(ui.equals("Today")) td.get(c).setComplitionDate(LocalDate.now());
-    else td.get(c).setComplitionDate(stringToDate(ui));
+    else td.get(c).setComplitionDate(InputParser.stringToDate(ui));
   }
   private void chooseTodo(int c){
     String ui = "";
@@ -104,7 +104,7 @@ public class Main{
     do{
       ui = getInput();
       isValid = v.validateChooseTask(ui, (td.size()));
-      choosedTodo = parseUserInt(ui);
+      choosedTodo = InputParser.parseUserInt(ui);
     } while(!isValid);
     if(c==3) finishTodo(choosedTodo);
     else if(c==4) createTask(choosedTodo);
@@ -120,7 +120,7 @@ public class Main{
     do{
       ui = getInput();
       isValid = v.validateChooseTask(ui, (iTodo.getTaskList().size()));
-      choosedTask = parseUserInt(ui);
+      choosedTask = InputParser.parseUserInt(ui);
     } while(!isValid);
     finishTask(iTodo, choosedTask);
   }
@@ -140,10 +140,10 @@ public class Main{
               task.setName(ui);
               break;
             case 2:
-              task.setPredictedDate(stringToDate(ui));
+              task.setPredictedDate(InputParser.stringToDate(ui));
               break;
             case 3:
-              task.setImportance(intToImportance(parseUserInt(ui)));
+              task.setImportance(InputParser.intToImportance(InputParser.parseUserInt(ui)));
               break;
           }
           stage++;
@@ -162,7 +162,7 @@ public class Main{
       isValid = v.validateEndTask(ui);
     }while(!isValid);
     if(ui.equals("Today")) iTodo.getTaskList().get(c).setComplitionDate(LocalDate.now());
-    else iTodo.getTaskList().get(c).setComplitionDate(stringToDate(ui));
+    else iTodo.getTaskList().get(c).setComplitionDate(InputParser.stringToDate(ui));
   }
   private void chooseOption(int choice){
     switch(choice){
@@ -212,14 +212,6 @@ public class Main{
     }
     return true;
   }
-  private Integer parseUserInt(String s){
-    try{
-      return Integer.parseInt(s);
-    } catch(NumberFormatException e){
-      System.out.println("Please enter a digit specified in []");
-      return 0;
-    }
-  }
   private String getInput(){
     try{
       return br.readLine();
@@ -227,23 +219,5 @@ public class Main{
       System.out.println("Sorry, there must have been an error");
       return "";
     }
-  }
-  private LocalDate stringToDate(String s){
-    return LocalDate.parse(s, dtf);
-  }
-  private Importance intToImportance(Integer i){
-    Importance imp = null;
-    switch(i){
-      case 1:
-        imp = Importance.LOW;
-        break;
-      case 2:
-        imp = Importance.MEDIUM;
-        break;
-      case 3:
-        imp = Importance.HIGH;
-        break;
-    }
-    return imp;
   }
 }

@@ -34,6 +34,9 @@ public class Task implements TasksInterface{
   public Boolean isCompleted(){
     return this.completed;
   }
+  public void setCompleted(Boolean completed){
+    this.completed = completed;
+  }
   public void setName(String name){
     this.name = name;
   }
