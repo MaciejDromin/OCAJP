@@ -7,30 +7,33 @@ import java.time.LocalDate;
 
 public class Main{
   private List<ToDo> td;
-  private String[] menuOptions, tskCreate;
+  private final String[] menuOptions, tskCreate;
   private BufferedReader br;
   private Validator v;
-  private FileParser fp;
+  //private FileParser fp;
   {
     td = new ArrayList<ToDo>();
     menuOptions = new String[]{"[1] Add ToDo",
                                 "[2] Print ToDos",
                                 "[3] Finish ToDo",
                                 "[4] Add Task to ToDo",
-                                "[5] Finish Task"};
+                                "[5] Finish Task",
+                                "[6] Remove ToDo",
+                                "[7] Remove Task",
+                                "[x] Exit"};
     tskCreate = new String[]{"Name: ",
                             "Predicted Date YYYY-MM-DD: ",
                             "Importance:%n\t[1]Low%n\t[2]Medium%n\t[3]High "};
     br = new BufferedReader(new InputStreamReader(System.in));
     v = new Validator();
-    fp = new FileParser();
+    //fp = new FileParser();
     /*for(int i=0;i<5;i++){
       ToDo ntd = new ToDo();
       Task ttt = new Task();
       ntd.setName("Test");
       ntd.setPredictedDate(LocalDate.now());
       ntd.setImportance(Importance.LOW);
-      /*for(int n=0;n<5;n++){
+      for(int n=0;n<5;n++){
         ttt.setName("Test");
         ttt.setPredictedDate(LocalDate.now());
         ttt.setImportance(Importance.LOW);
@@ -41,21 +44,23 @@ public class Main{
   }
   public static void main(String... args){
     Main m = new Main();
-    m.fp.openSession(m.td);
+    //m.fp.openSession(m.td);
     //System.out.println(System.getProperty("user.dir"));
     m.createLoop();
-    m.fp.saveSession(m.td);
+    //m.fp.saveSession(m.td);
   }
   private void createLoop(){
+    FileParser.openSession(td);
     String userChoiceS = "";
     int userChoice = 0;
     printMenu();
     while(!(userChoiceS = getInput()).isEmpty()){
+      if(userChoiceS.equals("x")) break;
       userChoice = InputParser.parseUserInt(userChoiceS);
-      if(userChoice==9) break;
       if(userChoice!=0) chooseOption(userChoice);
       printMenu();
     }
+    FileParser.saveSession(td);
   }
   private void createTodo(){
     String ui = "";
@@ -108,12 +113,16 @@ public class Main{
     } while(!isValid);
     if(c==3) finishTodo(choosedTodo);
     else if(c==4) createTask(choosedTodo);
+    else if(c==6) removeTodo(choosedTodo);
+    else if(c==7){
+      if(printTasks(td.get(choosedTodo))) chooseTask(td.get(choosedTodo), c);
+    }
     else{
-      if(printTasks(td.get(choosedTodo))) chooseTask(td.get(choosedTodo));
+      if(printTasks(td.get(choosedTodo))) chooseTask(td.get(choosedTodo), c);
       else System.out.println("There are no Tasks in this Todo, add some.");
     }
   }
-  private void chooseTask(ToDo iTodo){
+  private void chooseTask(ToDo iTodo, int c){
     String ui = "";
     boolean isValid = false;
     int choosedTask = 0;
@@ -122,7 +131,8 @@ public class Main{
       isValid = v.validateChooseTask(ui, (iTodo.getTaskList().size()));
       choosedTask = InputParser.parseUserInt(ui);
     } while(!isValid);
-    finishTask(iTodo, choosedTask);
+    if(c==7) removeTask(iTodo, choosedTask);
+    else finishTask(iTodo, choosedTask);
   }
   private void createTask(int c){
     String ui = "";
@@ -164,6 +174,12 @@ public class Main{
     if(ui.equals("Today")) iTodo.getTaskList().get(c).setComplitionDate(LocalDate.now());
     else iTodo.getTaskList().get(c).setComplitionDate(InputParser.stringToDate(ui));
   }
+  private void removeTodo(int c){
+    td.remove(c);
+  }
+  private void removeTask(ToDo iTodo, int c){
+    iTodo.getTaskList().remove(c);
+  }
   private void chooseOption(int choice){
     switch(choice){
       case 1:
@@ -178,6 +194,14 @@ public class Main{
           else System.out.println("There are no todos, add some.");
         break;
       case 5:
+        if(printToDosWithTasks()) chooseTodo(choice);
+        else System.out.println("There are no todos, add some.");
+        break;
+      case 6:
+        if(printToDos()) chooseTodo(choice);
+        else System.out.println("There are no todos, add some.");
+        break;
+      case 7:
         if(printToDosWithTasks()) chooseTodo(choice);
         else System.out.println("There are no todos, add some.");
         break;
