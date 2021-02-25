@@ -3,7 +3,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.time.format.DateTimeFormatter;
 
-public class Task implements TasksInterface{
+public class Task implements TasksInterface, Comparable<Task>{
   private Boolean completed;
   private String name;
   private LocalDate predictedDate;
@@ -75,5 +75,16 @@ public class Task implements TasksInterface{
     m.put("complitionDate", this.complitionDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     m.put("isCompleted", String.valueOf(this.completed));
     return m;
+  }
+
+  public int compareTo(Task o){
+    int result = (this.name.equals(o.getName()))==true?0:-1;
+    if(result == 0){
+      result = (this.predictedDate.equals(o.getPredictedDate()))==true?0:-1;
+    }
+    if(result == 0){
+      result = (o.getImportance()==this.importance)?0:-1;
+    }
+    return result;
   }
 }

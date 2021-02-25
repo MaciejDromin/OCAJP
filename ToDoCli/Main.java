@@ -51,6 +51,7 @@ public class Main{
   }
   private void createLoop(){
     FileParser.openSession(td);
+    Statistics st = new Statistics(this.td);
     String userChoiceS = "";
     int userChoice = 0;
     printMenu();
