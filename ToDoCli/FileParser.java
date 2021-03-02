@@ -63,12 +63,12 @@ public class FileParser{
           List<Task> tArray = new ArrayList<Task>();
           for(Object tO : tasksArray){
             Task tsk = new Task();
-            JSONObject tskObj = (JSONObject) o;
+            JSONObject tskObj = (JSONObject) tO;
             tsk.setName(tskObj.getString("name"));
-            tsk.setPredictedDate(InputParser.stringToDate(tdObj.getString("predictedDate")));
-            tsk.setImportance(InputParser.stringToImportance(tdObj.getString("importance")));
-            tsk.setComplitionDate(InputParser.stringToDate(tdObj.getString("complitionDate")));
-            tsk.setCompleted(Boolean.valueOf(tdObj.getString("isCompleted")));
+            tsk.setPredictedDate(InputParser.stringToDate(tskObj.getString("predictedDate")));
+            tsk.setImportance(InputParser.stringToImportance(tskObj.getString("importance")));
+            tsk.setComplitionDate(InputParser.stringToDate(tskObj.getString("complitionDate")));
+            tsk.setCompleted(Boolean.valueOf(tskObj.getString("isCompleted")));
             tArray.add(tsk);
           }
           todo.setTaskList(tArray);

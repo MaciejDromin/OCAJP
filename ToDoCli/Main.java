@@ -51,7 +51,8 @@ public class Main{
   }
   private void createLoop(){
     FileParser.openSession(td);
-    Statistics st = new Statistics(this.td);
+    Statistics st = new Statistics(td);
+    System.out.printf("%, .2f%% %, .2f%% %n", st.getPercentage()*100, st.getTskPercentage()*100);
     String userChoiceS = "";
     int userChoice = 0;
     printMenu();
