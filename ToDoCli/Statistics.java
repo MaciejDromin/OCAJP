@@ -8,9 +8,16 @@ public class Statistics{
   private final List<ToDo> tdl;
   private int todosCompleted;
   private TreeMap<ToDo, Integer> tasksCompleted;
-  private TreeMap<LocalDate, ArrayList<Integer>> todosComplPerDay;
+  private int todos;
+  private int tasks;
+  private int sumTasks;
+  private TreeMap<LocalDate, Point> todosComplPerDay;
+  private TreeMap<LocalDate, Point> todosPerDay;
+  private TreeMap<LocalDate, Point> tasksComplPerDay;
+  private TreeMap<LocalDate, Point> tasksPerDay;
   private TreeMap<LocalDate, Double> dayPercentage;
   private double percentage, tskPercentage;
+
   public Statistics(List<ToDo> tdl){
     this.tdl = Objects.requireNonNull(tdl);
     calcTodosAndTasksCompleted();
@@ -18,6 +25,10 @@ public class Statistics{
   {
     tasksCompleted = new TreeMap<ToDo, Integer>();
     dayPercentage = new TreeMap<LocalDate, Double>();
+    todosComplPerDay = new TreeMap<LocalDate, Point>();
+    tasksComplPerDay = new TreeMap<LocalDate, Point>();
+    todosPerDay = new TreeMap<LocalDate, Point>();
+    tasksPerDay = new TreeMap<LocalDate, Point>();
   }
   private void calcTodosAndTasksCompleted(){
     int sumForTasks = 0;
@@ -26,13 +37,47 @@ public class Statistics{
     sumsTsk = new int[3];
     sumsTdCompl = new int[3];
     sumsTskCompl = new int[3];
-    for(ToDo otd : this.tdl){
-      if(otd.isCompleted()) this.todosCompleted++;
+    for(ToDo otd : tdl){
+      if(otd.isCompleted()){
+          todosCompleted++;
+      }
+      calcDayCompletion(todosPerDay, todosComplPerDay, otd);
+      todos++;
       calcTasksCompleted(otd, sumsTsk, sumsTskCompl);
       addSums(otd, sumsTd, sumsTdCompl);
     }
     calcDayPercentage();
     calcAllPercentage(sumsTd, sumsTsk, sumsTdCompl, sumsTskCompl);
+    //System.out.println(todosPerDay + " " + todosComplPerDay);
+    //System.out.println(tasksPerDay + " " + tasksComplPerDay);
+  }
+
+  private void calcDayCompletion(TreeMap<LocalDate, Point> inProgress,
+                                  TreeMap<LocalDate, Point> completed,
+                                  Task t){
+    if(!inProgress.containsKey(t.getPredictedDate())){
+      if(t.isCompleted()){
+        if(!completed.containsKey(t.getComplitionDate())){
+          if(t.getPredictedDate().equals(t.getComplitionDate())){
+            completed.put(t.getComplitionDate(), new Point(1, calcWage(t)));
+          }
+        } else {
+          if(t.getPredictedDate().equals(t.getComplitionDate())) completed.replace(t.getComplitionDate(), completed.get(t.getComplitionDate()).clone(calcWage(t)));
+        }
+      }
+      inProgress.put(t.getPredictedDate(), new Point(1, calcWage(t)));
+    } else {
+      if(t.isCompleted()){
+        if(!completed.containsKey(t.getComplitionDate())){
+          if(t.getPredictedDate().equals(t.getComplitionDate())){
+            completed.put(t.getComplitionDate(), new Point(1, calcWage(t)));
+          }
+        } else {
+          if(t.getPredictedDate().equals(t.getComplitionDate())) completed.replace(t.getComplitionDate(), completed.get(t.getComplitionDate()).clone(calcWage(t)));
+        }
+      }
+      inProgress.replace(t.getPredictedDate(), inProgress.get(t.getPredictedDate()).clone(calcWage(t)));
+    }
   }
 
   private void calcDayPercentage(){
@@ -47,10 +92,34 @@ public class Statistics{
   private void calcTasksCompleted(ToDo otd, int sums[], int sumsCompleted[]){
     int sumForTasks = 0;
     for(Task tsk : otd.getTaskList()){
-      if(tsk.isCompleted()) sumForTasks++;
+      if(tsk.isCompleted()){
+          sumForTasks++;
+          sumTasks++;
+      }
+      /*
+      if(!tasksPerDay.containsKey(tsk.getPredictedDate())){
+        if(tsk.isCompleted()){
+          if(!tasksComplPerDay.containsKey(tsk.getComplitionDate())){
+            if(tsk.getPredictedDate().equals(tsk.getComplitionDate())){
+              tasksComplPerDay.put(tsk.getComplitionDate(), new Point(1, calcWage(tsk)));
+              System.out.println(tsk);
+            }
+          } else {
+            if(tsk.getPredictedDate().equals(tsk.getComplitionDate())){
+              tasksComplPerDay.replace(tsk.getComplitionDate(), tasksComplPerDay.get(tsk.getComplitionDate()).clone(calcWage(tsk)));
+            }
+          }
+        }
+        tasksPerDay.put(tsk.getPredictedDate(), new Point(1, calcWage(tsk)));
+      } else {
+        tasksPerDay.replace(tsk.getPredictedDate(), tasksPerDay.get(tsk.getPredictedDate()).clone(calcWage(tsk)));
+      }
+      */
+      calcDayCompletion(tasksPerDay, tasksComplPerDay, tsk);
+      tasks++;
       addSums(tsk, sums, sumsCompleted);
     }
-    this.tasksCompleted.put(otd, sumForTasks);
+    tasksCompleted.put(otd, sumForTasks);
     sumForTasks = 0;
   }
 
@@ -71,11 +140,32 @@ public class Statistics{
     }
   }
 
+  private int calcWage(Task tsk){
+    switch(tsk.getImportance()){
+      case LOW:
+        return 1;
+      case MEDIUM:
+        return 3;
+      case HIGH:
+        return 5;
+    }
+    return 0;
+  }
+
   public int getTodosCompleted(){
     return this.todosCompleted;
   }
-  public int getTasksCompleted(ToDo td){
+  public int getTasksCompletedPerTodo(ToDo td){
     return this.tasksCompleted.get(td);
+  }
+  public int getTasksCompleted(){
+    return this.sumTasks;
+  }
+  public int getTodos(){
+    return this.todos;
+  }
+  public int getTasks(){
+    return this.tasks;
   }
   public double getDayPercentage(LocalDate ld){
     return this.dayPercentage.get(ld);
@@ -85,5 +175,17 @@ public class Statistics{
   }
   public double getTskPercentage(){
     return this.tskPercentage;
+  }
+  public TreeMap<LocalDate, Point> getTodosComplPerDay(){
+    return this.todosComplPerDay;
+  }
+  public TreeMap<LocalDate, Point> getTasksComplPerDay(){
+      return this.tasksComplPerDay;
+  }
+  public TreeMap<LocalDate, Point> getTodosPerDay(){
+    return this.todosPerDay;
+  }
+  public TreeMap<LocalDate, Point> getTasksPerDay(){
+    return this.tasksPerDay;
   }
 }

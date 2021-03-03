@@ -1,5 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -20,6 +22,7 @@ public class Main{
                                 "[5] Finish Task",
                                 "[6] Remove ToDo",
                                 "[7] Remove Task",
+                                "[8] Statistics",
                                 "[x] Exit"};
     tskCreate = new String[]{"Name: ",
                             "Predicted Date YYYY-MM-DD: ",
@@ -51,8 +54,7 @@ public class Main{
   }
   private void createLoop(){
     FileParser.openSession(td);
-    Statistics st = new Statistics(td);
-    System.out.printf("%, .2f%% %, .2f%% %n", st.getPercentage()*100, st.getTskPercentage()*100);
+    //System.out.printf("%, .2f%% %, .2f%% %n", st.getPercentage()*100, st.getTskPercentage()*100);
     String userChoiceS = "";
     int userChoice = 0;
     printMenu();
@@ -207,6 +209,9 @@ public class Main{
         if(printToDosWithTasks()) chooseTodo(choice);
         else System.out.println("There are no todos, add some.");
         break;
+      case 8:
+        printStatistics();
+        break;
     }
   }
   private void printMenu(){
@@ -237,6 +242,29 @@ public class Main{
       System.out.println("["+tl.indexOf(t)+"] "+t.toString());
     }
     return true;
+  }
+  private void printStatistics(){
+    Statistics st = new Statistics(td);
+    String formatForStatistics = "n of ToDos.: %d \t n of ToDos Completed: %d \t ToDos Completed Perc.: %, .2f%% %n" +
+                                  "n of Tasks nr.: %d \t n of Tasks Completed: %d \t Tasks Completed Perc.: %, .2f%% %n";
+    System.out.printf(formatForStatistics, st.getTodos(), st.getTodosCompleted(), st.getPercentage()*100,
+                                            st.getTasks(), st.getTasksCompleted(), st.getTskPercentage()*100);
+    System.out.println("------------------------");
+    TreeMap<LocalDate, Point> temp = st.getTodosPerDay();
+    TreeMap<LocalDate, Point> temp2 = st.getTodosComplPerDay();
+    perDayLoop(temp, temp2, "ToDos");
+    System.out.println("------------------------");
+    temp = st.getTasksPerDay();
+    temp2 = st.getTasksComplPerDay();
+    perDayLoop(temp, temp2, "Tasks");
+    st = null;
+  }
+  private void perDayLoop(TreeMap<LocalDate, Point> t1, TreeMap<LocalDate, Point> t2, String m){
+    for(Map.Entry<LocalDate, Point> e : t1.entrySet()){
+      Point p = e.getValue();
+      System.out.printf("%1$td %1$tB,  %1$tY%n", e.getKey());
+      System.out.printf("n of %s: %d \t n of %s Completed: %d%n", m, p.getCount(), m, t2.get(e.getKey())!=null?t2.get(e.getKey()).getCount():0);
+    }
   }
   private String getInput(){
     try{
