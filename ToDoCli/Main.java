@@ -12,7 +12,6 @@ public class Main{
   private final String[] menuOptions, tskCreate;
   private BufferedReader br;
   private Validator v;
-  //private FileParser fp;
   {
     td = new ArrayList<ToDo>();
     menuOptions = new String[]{"[1] Add ToDo",
@@ -47,14 +46,10 @@ public class Main{
   }
   public static void main(String... args){
     Main m = new Main();
-    //m.fp.openSession(m.td);
-    //System.out.println(System.getProperty("user.dir"));
     m.createLoop();
-    //m.fp.saveSession(m.td);
   }
   private void createLoop(){
     FileParser.openSession(td);
-    //System.out.printf("%, .2f%% %, .2f%% %n", st.getPercentage()*100, st.getTskPercentage()*100);
     String userChoiceS = "";
     int userChoice = 0;
     printMenu();
@@ -252,18 +247,18 @@ public class Main{
     System.out.println("------------------------");
     TreeMap<LocalDate, Point> temp = st.getTodosPerDay();
     TreeMap<LocalDate, Point> temp2 = st.getTodosComplPerDay();
-    perDayLoop(temp, temp2, "ToDos");
+    perDayLoop(temp, temp2, "ToDos", st);
     System.out.println("------------------------");
     temp = st.getTasksPerDay();
     temp2 = st.getTasksComplPerDay();
-    perDayLoop(temp, temp2, "Tasks");
+    perDayLoop(temp, temp2, "Tasks", st);
     st = null;
   }
-  private void perDayLoop(TreeMap<LocalDate, Point> t1, TreeMap<LocalDate, Point> t2, String m){
+  private void perDayLoop(TreeMap<LocalDate, Point> t1, TreeMap<LocalDate, Point> t2, String m, Statistics st){
     for(Map.Entry<LocalDate, Point> e : t1.entrySet()){
       Point p = e.getValue();
       System.out.printf("%1$td %1$tB,  %1$tY%n", e.getKey());
-      System.out.printf("n of %s: %d \t n of %s Completed: %d%n", m, p.getCount(), m, t2.get(e.getKey())!=null?t2.get(e.getKey()).getCount():0);
+      System.out.printf("n of %s: %d \t n of %s Completed: %d \t Perc.: %, .2f%% %n", m, p.getCount(), m, t2.get(e.getKey())!=null?t2.get(e.getKey()).getCount():0, st.calcDayPerc(p, t2.get(e.getKey())!=null?t2.get(e.getKey()):0)*100);
     }
   }
   private String getInput(){
